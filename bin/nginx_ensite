@@ -30,8 +30,13 @@
 
 SCRIPTNAME=${0##*/}
 
-NGINX_BIN='nginx'
-NGINX_SVC='nginx'
+if [[ "$SCRIPTNAME" =~ ^openresty_ ]]; then
+    NGINX_BIN='openresty'
+    NGINX_SVC='openresty'
+else
+    NGINX_BIN='nginx'
+    NGINX_SVC='nginx'
+fi
 
 ## The nginx binary. Check if we're root or not. If we are get the
 ## path to nginx.  If not hardcode the path.
@@ -44,7 +49,7 @@ else
 fi
 
 ## Default value for the configuration directory.
-NGINX_CONF_DIR=/etc/nginx
+NGINX_CONF_DIR="/etc/${NGINX_BIN}"
 
 ## Default service reload command
 if cat /proc/1/status | grep ^Name | grep -q systemd; then
@@ -64,7 +69,7 @@ function print_usage() {
 ## Returns the proper startup program name,
 function get_startup_program_name() {
     local value="$1"
-    if [[ $1 =~ [[:alnum:]/-]+nginx$ ]]; then
+    if [[ $1 =~ [[:alnum:]/-]+(nginx|openresty)$ ]]; then
         value="$1 -s reload"
     elif [ -z "$1" ]; then
         value="$SVC_RELOAD_DEFAULT"

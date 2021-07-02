@@ -55,6 +55,16 @@ tag:
 
 release: tag download sign
 
+install_openresty:
+	for dir in $(INSTALL_DIRS); do mkdir -p $(DESTDIR)$(PREFIX)/$$dir; done
+	for file in $(INSTALL_FILES); do [[ $$file =~ index\.txt$$ ]] || cp $$file $(DESTDIR)$(PREFIX)/$$(echo $$file | sed 's/nginx/openresty/'); done
+	(cd $(DESTDIR)$(PREFIX)/bin && test -L openresty_dissite || ln -s openresty_ensite openresty_dissite)
+	mkdir -p $(DESTDIR)$(DOC_DIR)
+	cp -r doc/man/$(DOC_FILES) $(DESTDIR)$(DOC_DIR)/
+	mkdir -p $(COMPLETION_DIR)
+	cp bash_completion.d/nginx_ensite $(COMPLETION_DIR)/openresty_ensite
+	sed -i 's/nginx/openresty/g' $(COMPLETION_DIR)/openresty_ensite
+
 install:
 	for dir in $(INSTALL_DIRS); do mkdir -p $(DESTDIR)$(PREFIX)/$$dir; done
 	for file in $(INSTALL_FILES); do [[ $$file =~ index\.txt$$ ]] || cp $$file $(DESTDIR)$(PREFIX)/$$file; done
@@ -66,7 +76,9 @@ install:
 
 uninstall:
 	for file in $(INSTALL_FILES); do rm -f $(DESTDIR)$(PREFIX)/$$file; done
+	for file in $(INSTALL_FILES); do rm -f $(DESTDIR)$(PREFIX)/$$(echo $$file | sed 's/nginx/openresty/'); done
 	rm -rf $(DESTDIR)$(DOC_DIR)
-	rm $(COMPLETION_DIR)/$(NAME)
+	rm $(COMPLETION_DIR)/nginx_ensite
+	rm $(COMPLETION_DIR)/openresty_ensite
 
 .PHONY: build man update download sign verify clean check test tag release rpm install uninstall all
