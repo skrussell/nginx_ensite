@@ -54,7 +54,7 @@ function print_usage() {
 ## Returns the proper startup program name,
 function get_startup_program_name() {
     local value="$1"
-    if [[ $1 =~ [[:alnum:]/-]]+nginx$ ]]; then
+    if [[ $1 =~ [[:alnum:]/-]+nginx$ ]]; then
         value="$1 -s reload"
     elif [ -z "$1" ]; then
         value="service nginx reload"
